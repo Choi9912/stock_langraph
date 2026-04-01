@@ -7,28 +7,24 @@ $ python main.py "삼성전자"
 
 # 삼성전자 (005930.KS) 분석 리포트
 # 시그널: [+] BUY | 신뢰도: 89.8%
-# 종합 스코어: 0.651
+# 종합 스코어: 0.654
 ```
 
 ## Architecture
 
-![Graph Architecture](docs/graph_architecture.png)
-
-**7개 에이전트가 병렬로 분석 → Validator가 검증 → 실패 시 자동 재시도 → Synthesizer가 종합 판단**
-
 ```
-Input Parser
+Input Parser (GPT가 종목명 → 티커 변환)
     ├── Price Agent        (기술적 분석: RSI, MACD, 볼린저밴드)
     ├── Fundamental Agent  (펀더멘털: PER, PBR, ROE, 부채비율)
-    ├── Disclosure Agent   (공시 분석: DART 전자공시)
-    ├── News Agent         (뉴스 감성 분석)
+    ├── Disclosure Agent   (공시 분석: DART/SEC EDGAR)
+    ├── News Agent         (뉴스 감성 분석: NewsAPI 배치)
     ├── Macro Agent        (거시경제: VIX, 금리, 환율)
     ├── Supply/Demand Agent(수급: 기관/외국인 매매동향)
-    └── Consensus Agent    (애널리스트 컨센서스)
+    └── Consensus Agent    (애널리스트 컨센서스: 목표가, 투자의견)
          ↓
-    Validator (품질 검증 + 자동 재시도)
+    Validator (품질 검증 + 실패 에이전트만 자동 재시도, 최대 2회)
          ↓
-    Synthesizer (기간별 가중치 적용 → 종합 스코어)
+    Synthesizer (종목별 가중치 적용 → 종합 스코어 → 시그널)
          ↓
     Report Generator (마크다운 리포트)
 ```
@@ -43,68 +39,119 @@ Input Parser
 | 0.30 ~ 0.44 | SELL |
 | < 0.30 | STRONG_SELL |
 
-기간(단기/중기/장기)에 따라 에이전트별 가중치가 달라집니다:
+## 종목별 가중치 (백테스트 기반 자동 최적화)
+
+과거 3개월(12주) 백테스트를 통해 종목별로 어떤 에이전트가 정확했는지 분석하고, 최적 가중치를 자동 도출합니다.
+
+| 종목 | 상위 가중치 |
+|---|---|
+| 삼성전자 | consensus 35%, supply_demand 15%, disclosure 13% |
+| SK하이닉스 | supply_demand 30%, consensus 20%, disclosure 13% |
+| 현대차 | consensus 45%, supply_demand 30%, price 10% |
+| NVIDIA | consensus 40%, fundamental 35%, price 5% |
+| Tesla | consensus 40%, disclosure 15%, news 15% |
+
+종목별 가중치가 없는 종목은 기간별 기본 가중치를 사용합니다:
 - **단기**: 기술적 분석(25%) + 수급(20%) 중심
 - **중기**: 펀더멘털(20%) + 컨센서스(20%) 중심
 - **장기**: 펀더멘털(30%) + 컨센서스(25%) 중심
 
-## Example Results
+## Daily Tracking (자동화)
 
-| 종목 | 시그널 | 스코어 | 신뢰도 | 리포트 |
-|---|---|---|---|---|
-| 삼성전자 | **BUY** | 0.651 | 89.8% | [samsung_electronics.md](examples/samsung_electronics.md) |
-| SK하이닉스 | **HOLD** | 0.641 | 85.8% | [sk_hynix.md](examples/sk_hynix.md) |
-| 카카오 | **HOLD** | 0.535 | 91.4% | [kakao.md](examples/kakao.md) |
-| 현대차 | **HOLD** | 0.550 | 89.3% | [hyundai_motor.md](examples/hyundai_motor.md) |
-| LG에너지솔루션 | **SELL** | 0.431 | 84.3% | [lg_energy_solution.md](examples/lg_energy_solution.md) |
+GitHub Actions로 매일 KOSPI 5 + NASDAQ 5 종목을 자동 분석합니다.
+
+| 스케줄 | 시간 (KST) | 대상 |
+|---|---|---|
+| 국장 | 평일 16:00 | 삼성전자, SK하이닉스, 현대차, NAVER, 카카오 |
+| 미장 | 화~토 07:00 | Apple, NVIDIA, Tesla, Microsoft, Alphabet |
+| 가중치 튜닝 | 매주 일요일 | 백테스트 평가 → 가중치 자동 조정 |
+
+결과는 `data/history/YYYY-MM-DD.json`에 자동 커밋됩니다.
+
+```bash
+# 기록 조회
+python history_viewer.py latest                          # 최근 기록
+python history_viewer.py history --ticker 삼성전자         # 종목별 추이
+python history_viewer.py compare --day1 2026-04-01 --day2 2026-04-08  # 날짜 비교
+```
+
+## 가중치 자동 튜닝
+
+매주 백테스트를 통해 가중치를 자동으로 조정합니다:
+
+1. 과거 시그널과 실제 수익률 비교
+2. 에이전트별 정확도 + 상관계수 계산
+3. 정확한 에이전트 → 가중치 UP, 부정확 → DOWN
+4. 종목별 보정값 업데이트
+
+```bash
+# 수동 실행
+python -m tools.historical_backtest --weeks 12    # 과거 백테스트
+python -m tools.weight_tuner tune --days 10       # 가중치 튜닝
+python -m tools.weight_tuner apply                # settings.py에 반영
+```
+
+## Example Results (2026-04-01)
+
+| 종목 | 시그널 | 스코어 | 신뢰도 | 현재가 | 목표가 |
+|---|---|---|---|---|---|
+| 삼성전자 | **BUY** | 0.654 | 89.8% | 189,600 | 239,873 |
+| SK하이닉스 | HOLD | 0.641 | 85.8% | 893,000 | 1,320,166 |
+| NAVER | HOLD | 0.609 | 87.5% | 210,000 | 325,885 |
+| Alphabet | HOLD | 0.566 | 88.5% | 288 | 377 |
+| Microsoft | HOLD | 0.560 | 91.5% | 370 | 590 |
+| NVIDIA | HOLD | 0.540 | 91.6% | 174 | 268 |
+| Tesla | HOLD | 0.481 | 94.8% | 372 | 421 |
 
 ## Tech Stack
 
 - **Framework**: [LangGraph](https://github.com/langchain-ai/langgraph) (StateGraph, 병렬 fan-out/fan-in)
-- **LLM**: GPT-4o-mini (분석 1회당 LLM 호출 8회 = 7 에이전트 + 1 Synthesizer)
-- **Data Sources**: yfinance, pykrx, DART OpenAPI, NewsAPI, FRED
-- **Language**: Python 3.11+
-
-### Key Design Decisions
-
-- **병렬 실행**: 7개 에이전트가 동시에 실행되어 분석 시간 최소화
-- **자동 재시도**: Validator가 실패한 에이전트만 선별하여 최대 2회 재시도
-- **Graceful Degradation**: API 실패 시 만료 캐시 → 에러 로그 기록 + score 0.0 (크래시 방지)
-- **파일 캐시**: 모든 외부 API 응답을 `cached_api_call()`로 캐싱 (TTL 기반)
-- **JSON-only LLM 응답**: 모든 LLM 출력을 구조화된 JSON으로 강제하여 파싱 안정성 확보
+- **LLM**: GPT-4o-mini (분석 1회당 약 2원)
+- **Data**: yfinance, pykrx, DART OpenAPI, Alpha Vantage, NewsAPI, FRED
+- **CI/CD**: GitHub Actions (매일 자동 분석 + 매주 가중치 튜닝)
+- **Language**: Python 3.12
 
 ## Project Structure
 
 ```
 stock-advisor/
-├── main.py                  # 진입점
+├── main.py                     # 단일 종목 분석 진입점
+├── daily_tracker.py            # 매일 10종목 자동 분석
+├── history_viewer.py           # 기록 조회 + 추이 비교
 ├── graph/
-│   ├── state.py             # StockAnalysisState (Annotated reducer 기반)
-│   ├── graph.py             # LangGraph 빌드 (fan-out/fan-in + retry)
-│   └── edges.py             # Conditional edge 라우팅
+│   ├── state.py                # StockAnalysisState
+│   ├── graph.py                # LangGraph (7 에이전트 병렬 + retry)
+│   └── edges.py                # Conditional edge 라우팅
 ├── agents/
-│   ├── base.py              # BaseAgent 추상 클래스
-│   ├── input_parser.py      # 종목명 → ticker 변환
-│   ├── price_agent.py       # 기술적 분석 (RSI, MACD, BB)
-│   ├── fundamental_agent.py # 재무제표 분석
-│   ├── disclosure_agent.py  # DART 공시 분석
-│   ├── news_agent.py        # 뉴스 감성 분석
-│   ├── macro_agent.py       # 거시경제 지표
-│   ├── supply_demand_agent.py # 수급 분석
-│   ├── consensus_agent.py   # 애널리스트 컨센서스
-│   ├── validator.py         # 품질 검증 + 재시도 판단
-│   ├── synthesizer.py       # 가중 평균 스코어 → 시그널
-│   └── report_generator.py  # 마크다운 리포트 생성
+│   ├── base.py                 # BaseAgent (Fetch→Analyze→Score)
+│   ├── input_parser.py         # GPT 기반 종목명→티커 변환
+│   ├── price_agent.py          # 기술적 분석
+│   ├── fundamental_agent.py    # 펀더멘털 분석
+│   ├── disclosure_agent.py     # 공시 분석
+│   ├── news_agent.py           # 뉴스 감성 분석
+│   ├── macro_agent.py          # 거시경제 분석
+│   ├── supply_demand_agent.py  # 수급 분석
+│   ├── consensus_agent.py      # 애널리스트 컨센서스
+│   ├── validator.py            # 품질 검증 + 재시도
+│   ├── synthesizer.py          # 종합 스코어 → 시그널
+│   └── report_generator.py     # 마크다운 리포트
 ├── tools/
-│   └── cache.py             # cached_api_call (TTL 기반 파일 캐시)
+│   ├── cache.py                # TTL 기반 파일 캐시
+│   ├── backtest_evaluator.py   # 시그널 vs 실제 수익률 평가
+│   ├── weight_tuner.py         # 가중치 자동 조정
+│   └── historical_backtest.py  # 과거 백테스트 시뮬레이션
 ├── utils/
-│   ├── ticker_mapper.py     # 종목명 ↔ ticker 매핑
-│   └── score_calculator.py  # 스코어 유효성 검증
+│   ├── ticker_mapper.py        # 종목명 ↔ 티커
+│   └── score_calculator.py     # 종목별/기간별 가중치 적용
 ├── config/
-│   └── settings.py          # 가중치, 시그널 기준, API 키
-├── docs/
-│   └── graph_architecture.png
-├── examples/                # 분석 결과 샘플
+│   └── settings.py             # 가중치, 시그널 기준, API 키
+├── data/
+│   ├── history/                # 매일 분석 기록 (JSON)
+│   ├── backtest/               # 백테스트 결과 + 종목별 가중치
+│   └── tuning/                 # 가중치 튜닝 히스토리
+├── .github/workflows/
+│   ├── daily_tracker.yml       # 매일 자동 분석
+│   └── weekly_tuning.yml       # 매주 가중치 튜닝
 └── tests/
 ```
 
@@ -112,14 +159,14 @@ stock-advisor/
 
 ### Prerequisites
 
-- Python 3.11+
+- Python 3.12+
 - OpenAI API Key
 
 ### Installation
 
 ```bash
-git clone https://github.com/your-username/stock-advisor.git
-cd stock-advisor
+git clone https://github.com/Choi9912/stock_langraph.git
+cd stock_langraph
 pip install -r requirements.txt
 ```
 
@@ -130,10 +177,11 @@ pip install -r requirements.txt
 ```env
 OPENAI_API_KEY=sk-your-key-here
 
-# Optional (없어도 기본 동작)
-DART_API_KEY=your-dart-key
-NEWSAPI_KEY=your-newsapi-key
-FRED_API_KEY=your-fred-key
+# Optional (없어도 기본 동작 — yfinance fallback)
+ALPHA_VANTAGE_KEY=your-key
+NEWSAPI_KEY=your-key
+FRED_API_KEY=your-key
+DART_API_KEY=your-key
 ```
 
 ### Usage
@@ -141,11 +189,22 @@ FRED_API_KEY=your-fred-key
 ```bash
 # 단일 종목 분석
 python main.py "삼성전자"
-python main.py "SK하이닉스"
+python main.py "코카콜라 장기 분석"
+python main.py "NVDA"
 
-# 대화형 모드
-python main.py
-> 분석할 종목을 입력하세요: 카카오
+# 매일 트래킹
+python daily_tracker.py                  # 전체 (KOSPI + NASDAQ)
+python daily_tracker.py --market krx     # 국장만
+python daily_tracker.py --market us      # 미장만
+
+# 기록 조회
+python history_viewer.py latest
+python history_viewer.py history --ticker 삼성전자 --days 30
+
+# 백테스트 + 가중치 튜닝
+python -m tools.historical_backtest --weeks 12
+python -m tools.weight_tuner tune
+python -m tools.weight_tuner apply
 ```
 
 ---
