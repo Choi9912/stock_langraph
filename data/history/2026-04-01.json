@@ -1,0 +1,206 @@
+{
+  "date": "2026-04-01",
+  "period": "short",
+  "stocks": [
+    {
+      "ticker": "005930.KS",
+      "name": "삼성전자",
+      "market": "KRX",
+      "signal": "HOLD",
+      "confidence": 0.823,
+      "weighted_score": 0.4919,
+      "scores": {
+        "price": 0.0,
+        "fundamental": 0.8025,
+        "disclosure": 0.5,
+        "news": 0.7,
+        "macro": 0.4125,
+        "supply_demand": 0.55,
+        "consensus": 0.84
+      },
+      "current_price": 0,
+      "target_mean": 239873.48,
+      "error_count": 3
+    },
+    {
+      "ticker": "000660.KS",
+      "name": "SK하이닉스",
+      "market": "KRX",
+      "signal": "HOLD",
+      "confidence": 0.792,
+      "weighted_score": 0.5146,
+      "scores": {
+        "price": 0.0,
+        "fundamental": 0.8925,
+        "disclosure": 0.5,
+        "news": 0.6167,
+        "macro": 0.4125,
+        "supply_demand": 0.655,
+        "consensus": 0.875
+      },
+      "current_price": 0,
+      "target_mean": 1320166.0,
+      "error_count": 3
+    },
+    {
+      "ticker": "005380.KS",
+      "name": "현대차",
+      "market": "KRX",
+      "signal": "HOLD",
+      "confidence": 0.858,
+      "weighted_score": 0.4634,
+      "scores": {
+        "price": 0.0,
+        "fundamental": 0.5375,
+        "disclosure": 0.5,
+        "news": 0.7654,
+        "macro": 0.4125,
+        "supply_demand": 0.5475,
+        "consensus": 0.765
+      },
+      "current_price": 0,
+      "target_mean": 630118.4,
+      "error_count": 3
+    },
+    {
+      "ticker": "035420.KS",
+      "name": "NAVER",
+      "market": "KRX",
+      "signal": "HOLD",
+      "confidence": 0.835,
+      "weighted_score": 0.5082,
+      "scores": {
+        "price": 0.0,
+        "fundamental": 0.66,
+        "disclosure": 0.5,
+        "news": 0.7286,
+        "macro": 0.4125,
+        "supply_demand": 0.655,
+        "consensus": 0.875
+      },
+      "current_price": 0,
+      "target_mean": 325884.62,
+      "error_count": 3
+    },
+    {
+      "ticker": "035720.KS",
+      "name": "카카오",
+      "market": "KRX",
+      "signal": "SELL",
+      "confidence": 0.856,
+      "weighted_score": 0.4335,
+      "scores": {
+        "price": 0.0,
+        "fundamental": 0.3775,
+        "disclosure": 0.5,
+        "news": 0.7,
+        "macro": 0.4125,
+        "supply_demand": 0.5475,
+        "consensus": 0.7375
+      },
+      "current_price": 0,
+      "target_mean": 76115.38,
+      "error_count": 3
+    },
+    {
+      "ticker": "AAPL",
+      "name": "Apple",
+      "market": "NASDAQ",
+      "signal": "HOLD",
+      "confidence": 0.94,
+      "weighted_score": 0.5292,
+      "scores": {
+        "price": 0.375,
+        "fundamental": 0.6175,
+        "disclosure": 0.5,
+        "news": 0.58,
+        "macro": 0.4125,
+        "supply_demand": 0.535,
+        "consensus": 0.7275
+      },
+      "current_price": 253.7899932861328,
+      "target_mean": 295.31,
+      "error_count": 0
+    },
+    {
+      "ticker": "NVDA",
+      "name": "NVIDIA",
+      "market": "NASDAQ",
+      "signal": "HOLD",
+      "confidence": 0.925,
+      "weighted_score": 0.5292,
+      "scores": {
+        "price": 0.345,
+        "fundamental": 0.6475,
+        "disclosure": 0.5,
+        "news": 0.6,
+        "macro": 0.4125,
+        "supply_demand": 0.535,
+        "consensus": 0.7375
+      },
+      "current_price": 174.39999389648438,
+      "target_mean": 268.22,
+      "error_count": 0
+    },
+    {
+      "ticker": "TSLA",
+      "name": "Tesla",
+      "market": "NASDAQ",
+      "signal": "HOLD",
+      "confidence": 0.946,
+      "weighted_score": 0.4718,
+      "scores": {
+        "price": 0.405,
+        "fundamental": 0.2975,
+        "disclosure": 0.5,
+        "news": 0.42,
+        "macro": 0.4125,
+        "supply_demand": 0.55,
+        "consensus": 0.6475
+      },
+      "current_price": 371.75,
+      "target_mean": 421.27,
+      "error_count": 0
+    },
+    {
+      "ticker": "MSFT",
+      "name": "Microsoft",
+      "market": "NASDAQ",
+      "signal": "HOLD",
+      "confidence": 0.915,
+      "weighted_score": 0.5601,
+      "scores": {
+        "price": 0.405,
+        "fundamental": 0.6875,
+        "disclosure": 0.6,
+        "news": 0.59,
+        "macro": 0.4125,
+        "supply_demand": 0.505,
+        "consensus": 0.8
+      },
+      "current_price": 370.1700134277344,
+      "target_mean": 589.9,
+      "error_count": 0
+    },
+    {
+      "ticker": "GOOGL",
+      "name": "Alphabet",
+      "market": "NASDAQ",
+      "signal": "HOLD",
+      "confidence": 0.891,
+      "weighted_score": 0.5664,
+      "scores": {
+        "price": 0.405,
+        "fundamental": 0.6175,
+        "disclosure": 0.65,
+        "news": 0.5,
+        "macro": 0.4125,
+        "supply_demand": 0.5575,
+        "consensus": 0.875
+      },
+      "current_price": 287.55999755859375,
+      "target_mean": 376.93,
+      "error_count": 0
+    }
+  ]
+}
