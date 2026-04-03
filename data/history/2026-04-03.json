@@ -1,0 +1,131 @@
+{
+  "date": "2026-04-03",
+  "period": "short",
+  "stocks": [
+    {
+      "ticker": "005930.KS",
+      "name": "삼성전자",
+      "market": "KRX",
+      "signal": "HOLD",
+      "confidence": 0.823,
+      "weighted_score": 0.4919,
+      "scores": {
+        "price": 0.0,
+        "fundamental": 0.8025,
+        "disclosure": 0.5,
+        "news": 0.7,
+        "macro": 0.4125,
+        "supply_demand": 0.55,
+        "consensus": 0.84
+      },
+      "current_price": 0,
+      "target_mean": 239873.48,
+      "error_count": 3,
+      "errors": [
+        "price: fetch returned None",
+        "price: fetch returned None",
+        "price: fetch returned None"
+      ]
+    },
+    {
+      "ticker": "000660.KS",
+      "name": "SK하이닉스",
+      "market": "KRX",
+      "signal": "HOLD",
+      "confidence": 0.799,
+      "weighted_score": 0.4859,
+      "scores": {
+        "price": 0.0,
+        "fundamental": 0.8925,
+        "disclosure": 0.5,
+        "news": 0.5,
+        "macro": 0.4125,
+        "supply_demand": 0.655,
+        "consensus": 0.8
+      },
+      "current_price": 0,
+      "target_mean": 1320166.0,
+      "error_count": 3,
+      "errors": [
+        "price: fetch returned None",
+        "price: fetch returned None",
+        "price: fetch returned None"
+      ]
+    },
+    {
+      "ticker": "005380.KS",
+      "name": "현대차",
+      "market": "KRX",
+      "signal": "HOLD",
+      "confidence": 0.847,
+      "weighted_score": 0.4689,
+      "scores": {
+        "price": 0.0,
+        "fundamental": 0.5375,
+        "disclosure": 0.5,
+        "news": 0.7667,
+        "macro": 0.4125,
+        "supply_demand": 0.5475,
+        "consensus": 0.8
+      },
+      "current_price": 0,
+      "target_mean": 630118.4,
+      "error_count": 3,
+      "errors": [
+        "price: fetch returned None",
+        "price: fetch returned None",
+        "price: fetch returned None"
+      ]
+    },
+    {
+      "ticker": "035420.KS",
+      "name": "NAVER",
+      "market": "KRX",
+      "signal": "HOLD",
+      "confidence": 0.838,
+      "weighted_score": 0.5039,
+      "scores": {
+        "price": 0.0,
+        "fundamental": 0.66,
+        "disclosure": 0.5,
+        "news": 0.7,
+        "macro": 0.4125,
+        "supply_demand": 0.655,
+        "consensus": 0.875
+      },
+      "current_price": 0,
+      "target_mean": 325884.62,
+      "error_count": 3,
+      "errors": [
+        "price: fetch returned None",
+        "price: fetch returned None",
+        "price: fetch returned None"
+      ]
+    },
+    {
+      "ticker": "035720.KS",
+      "name": "카카오",
+      "market": "KRX",
+      "signal": "HOLD",
+      "confidence": 0.847,
+      "weighted_score": 0.4385,
+      "scores": {
+        "price": 0.0,
+        "fundamental": 0.3775,
+        "disclosure": 0.5,
+        "news": 0.7333,
+        "macro": 0.4125,
+        "supply_demand": 0.5475,
+        "consensus": 0.7375
+      },
+      "current_price": 0,
+      "target_mean": 76115.38,
+      "error_count": 3,
+      "errors": [
+        "price: fetch returned None",
+        "price: fetch returned None",
+        "price: fetch returned None"
+      ]
+    }
+  ]
+}
